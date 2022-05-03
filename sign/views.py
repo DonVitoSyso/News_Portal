@@ -17,7 +17,7 @@ def upgrade_me(request):
     user = request.user
     author_group = Group.objects.get(name='authors')
     if not request.user.groups.filter(name='authors').exists():
-        user1 = Author(user=user)
-        user1.save() #сохраняем нашего пользователя в список авторов модели
+        user1 = Author(user=user) #сохраняем нашего пользователя в список авторов модели
+        user1.save()
         author_group.user_set.add(user)
     return redirect('/')
