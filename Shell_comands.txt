@@ -1,0 +1,75 @@
+>>> from News_Portal.models import *
+>>> u1 = User.objects.create_user(username='user1')
+>>> u2 = User.objects.create_user(username='user2')
+>>> Author.objects.create(user=u1)
+<Author: Author object (1)>
+>>> Author.objects.create(user=u2)
+<Author: Author object (2)>
+>>> Category.objects.create(name='sport')
+<Category: Category object (1)>
+>>> Category.objects.create(name='fashion')
+<Category: Category object (2)>
+>>> Category.objects.create(name='politics')
+<Category: Category object (3)>
+>>> Category.objects.create(name='science')
+<Category: Category object (4)>
+>>> text='sdasdadas asd asd as asdasdas dsa das das das das dasdsad ar fewfl eowf e,f; , 
+
+,f;la, fl,a l;f,a fl;am fl;mal; fmmf emf emif newifn eiuawbf ubua bubfuenwfj kanewfjnaesj 
+
+najebfj keb
+f jkbaejuf neajn fjkaenf jlenbawj fnaejnf jkaenfj naewnf jkaenf jkaenf jkenaj fnjkaesn fjkenf 
+
+nsk nfasjnf kjasenf jkanesfj knaesl fn'
+>>> author1 = Author.objects.get(id=1)
+>>> author2 = Author.objects.get(id=2)
+>>> Post.objects.create(title='Article 1',text=text,author=author1)
+<Post: Post object (1)>
+>>> Post.objects.create(title='Article 2',text='text2',author=author2)
+<Post: Post object (2)>
+>>> Post.objects.create(title='NEWS 1',text='text_news1',author=author2,type='NEWS')
+<Post: Post object (3)>
+>>> Post.objects.get(id=1).category.add(Category.objects.get(id=1))
+>>> Post.objects.get(id=1).category.add(Category.objects.get(id=2))
+>>> PostCategory.objects.all().values('category','post')
+>>> PostCategory.objects.filter(post=Post(1)).values('post', 'category')
+>>> Post.objects.get(id=2).category.add(Category.objects.get(id=3))
+>>> Post.objects.get(id=3).category.add(Category.objects.get(id=4))
+>>> PostCategory.objects.values('post', 'category')
+>>> Comment.objects.create(user=Author.objects.get(id=1).user, text='text1', 
+
+post=Post.objects.get(id=1))
+>>> Comment.objects.create(user=Author.objects.get(id=1).user, text='text2', 
+
+post=Post.objects.get(id=2))
+>>> Comment.objects.create(user=Author.objects.get(id=2).user, text='text1', 
+
+post=Post.objects.get(id=3))
+>>> Comment.objects.create(user=Author.objects.get(id=1).user, text='text1', 
+
+post=Post.objects.get(id=2))
+>>> Comment.objects.get(id=1).like()
+>>> Post.objects.get(id=1).like()
+>>> Comment.objects.get(id=1).dislike()
+>>> Author.objects.get(id=1).update_rating()
+>>> Author.objects.get(id=2).update_rating()
+>>> a = Author.objects.order_by('-rating')[:1]
+>>> for i in a:
+...     i.rating
+...     i.user.username
+>>> a[0].user.username
+>>> p = Post.objects.order_by('-rating')[:1]
+>>> p.values('time','author','rating','title')
+>>> for i in p:
+...     i.time.strftime("%Y-%m-%d, %H:%M:%S")
+...     i.author.user.username
+...     i.rating
+...     i.title
+...     i.preview()
+>>> c = Comment.objects.filter(post=p)
+>>> c.values('time','user','rating','text')
+>>> for i in c:
+...     i.time.strftime("%Y-%m-%d, %H:%M:%S")
+...     i.user.username
+...     i.rating
+...     i.text

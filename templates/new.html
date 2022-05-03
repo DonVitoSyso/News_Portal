@@ -1,0 +1,21 @@
+<!--  наследуемся от шаблона default.html, который мы создавали ещё во времена flatpages -->
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+{% load custom_tags %}
+
+{% block title %}
+New
+{% endblock title %}
+
+{% block content %}
+<h1> {{ new.title }} </h1>
+<hr>
+<tr>
+        <td>{{ new.author.user }}</td>
+        <td><h3>{% current_time '%d %b %Y' %}</h3></td>
+</tr>
+<hr>
+{{ new.text }}
+
+{% endblock content %}

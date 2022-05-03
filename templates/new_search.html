@@ -1,0 +1,68 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+News
+{% endblock title %}
+{% load custom_tags %}
+
+{% block content %}
+    <!-- Перед таблицей добавим форму для поиска -->
+    <form method="GET">
+        {{ filter.form }} <!-- Форму от фильтров за нас сделает django. А вот кнопку, увы придётся делать самому -->
+        <input type="submit" value="Найти">
+    </form>
+    {% if news %} <!-- Если есть новости, то выводим таблицу с ними -->
+        <table>
+            <tr>
+                <td>Дата публикации</td>
+                <td>Заголовок</td>
+                <td>Сатья</td>
+                <td>Автор</td>
+                <td>Категория</td>
+            </tr>
+            {% for new in news %} <!-- Для каждой новости будет генерироваться новая строчка, т. е. новый html-код. При этом сам цикл работает точно также, как и в Python. post — переменная цикла, т. е. наш товар, взятый из общего списка -->
+                <tr>
+                    <td>{{ new.date|date:'d-m-Y' }}</td>
+                    <td>{{ new.title }}</td>
+                    <td>{{ new.text|truncatechars:50 }}</td>
+                    <td>{{ new.author.user }}</td>
+                    <td>
+                        <!-- Достаем все категории по связи многим ко многим -->
+                        {% for category in new.category.all %}
+                            {{ category }}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <h2>НОВОСТЕЙ НЕТ!</h2>
+    {% endif %}
+    <!-- Проверяем что поддерживается постраничный вывод -->
+    <!-- Проверяем что поддерживается постраничный вывод -->
+    {% if is_paginated %}
+        <!-- Если доступна предыдущая страница, то даём ссылку на неё и самую первую страницу -->
+        {% if page_obj.has_previous %}
+            <a href="?{% url_replace page=1 %}">1</a>
+            {% if page_obj.previous_page_number != 1 %}
+                <a href="?{% url_replace page=page_obj.previous_page_number %}"><<<</a>
+                ...
+                <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+            {% endif %}
+        {% endif %}
+
+        <!-- Показываем только текущую страницу и ближайшие к ней, чтобы список не тянулся и не захламлял страницу -->
+        {{ page_obj.number }}
+
+        <!-- Если есть следующая страница, то даём ссылку на неё и на самую последнюю страницу -->
+        {% if page_obj.has_next %}
+            <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+            {% if paginator.num_pages != page_obj.next_page_number %}
+                ...
+                <a href="?{% url_replace page=page_obj.next_page_number %}">>>></a>
+                <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+
+{% endblock content %}

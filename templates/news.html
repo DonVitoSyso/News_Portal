@@ -1,0 +1,100 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+News
+{% endblock title %}
+{% load custom_tags %}
+
+{% block content %}
+
+    <h1>Все новости (всего {{ count }})</h1>
+
+    <table>
+        <td>|</td>
+        <td><a href="{% url 'news_create' %}">Добавить новую новость</a><br></td>
+        <td>|</td>
+        <td><a href="{% url 'articles_create' %}">Добавить новую статью</a><br></td>
+        <td>|</td>
+        <td><a href="{% url 'news_search' %}">Поиск статьи</a><br></td>
+    </table>
+    <hr>
+    {% if news %} <!-- Если есть новости, то выводим таблицу с ними -->
+        <table>
+            <tr>
+                <td>
+                    Заголовок
+                </td>
+                <td>
+                    Дата публикации
+                </td>
+                <td>
+                    Сатья
+                </td>
+                <td>
+                    Автор
+                </td>
+                <td>
+                    Категория
+                </td>
+            </tr>
+            {% for new in news %}
+                <tr>
+                    <td>
+                        {% if new.type == 'NEWS' %}
+                            <a href="{% url 'news' new.id %}">{{ new.title }}</a> <!-- При нажатии на имя товара в таблице нас теперь будет перекидывать на страницу с самого товара -->
+                            <a href="{% url 'news_update' new.id %}"><u>Редактировать</u></a> <!-- добавим ссылку на редактирование товара-->
+                            <a href="{% url 'news_delete' new.id %}"><u> Удалить </u></a> <!-- добавим ссылку на удаление товара-->
+                        {% else %}
+                            <a href="{% url 'news' new.id %}">{{ new.title }}</a>
+                            <a href="{% url 'articles_update' new.id %}"><u>Редактировать</u></a>
+                            <a href="{% url 'articles_delete' new.id %}"><u> Удалить </u></a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ new.date|date:'d-m-Y' }}
+                    </td>
+                    <td>
+                        {{ new.text|truncatechars:50 }}
+                    </td>
+                    <td>
+                        {{ new.author.user }}
+                    </td>
+                    <td>
+                        {% for category in new.category.all %}
+                            {{ category }}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <h2>НОВОСТЕЙ НЕТ!</h2>
+    {% endif %}
+
+    <!-- Проверяем что поддерживается постраничный вывод -->
+    {% if is_paginated %}
+        <!-- Если доступна предыдущая страница, то даём ссылку на неё и самую первую страницу -->
+        {% if page_obj.has_previous %}
+            <a href="?{% url_replace page=1 %}">1</a>
+            {% if page_obj.previous_page_number != 1 %}
+                <a href="?{% url_replace page=page_obj.previous_page_number %}"><<<</a>
+                ...
+                <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+            {% endif %}
+        {% endif %}
+
+        <!-- Показываем только текущую страницу и ближайшие к ней, чтобы список не тянулся и не захламлял страницу -->
+        {{ page_obj.number }}
+
+        <!-- Если есть следующая страница, то даём ссылку на неё и на самую последнюю страницу -->
+        {% if page_obj.has_next %}
+            <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+            {% if paginator.num_pages != page_obj.next_page_number %}
+                ...
+                <a href="?{% url_replace page=page_obj.next_page_number %}">>>></a>
+                <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+
+{% endblock content %}

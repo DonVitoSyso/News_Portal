@@ -1,0 +1,49 @@
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+
+{% block title %}
+News
+{% endblock title %}
+
+{% block content %}
+<h2>Вы действительно хотите удалить статью?</h2>
+
+<table>
+    <thead>
+        <tr>
+            <td>
+                Заголовок
+            </td>
+            <td>
+                Дата публикации
+            </td>
+            <td>
+                Сатья
+            </td>
+            <td>
+                Автор
+            </td>
+        </tr>
+    </thead>
+    <tr>
+        <td>
+            {{ new.title }}
+        </td>
+        <td>
+            {{ new.date|date:'d-m-Y' }}
+        </td>
+        <td>
+            {{ new.text|truncatechars:50 }}
+        </td>
+        <td>
+            {{ new.author.user }}
+        </td>
+    </tr>
+</table>
+
+<form method="POST">
+    {% csrf_token %}
+    <input type="submit" value="подтвердить"></form>
+
+{% endblock content %}

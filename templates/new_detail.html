@@ -1,0 +1,21 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+New
+{% endblock title %}
+
+{% block content %}
+<h1> {{ new.title }} </h1>
+<hr>
+<tr>
+        <td>
+            {{ new.author.user }}
+        </td>
+        <td>
+            {{ new.date|date:'d-m-Y' }}
+        </td>
+</tr>
+<hr>
+{{ new.text }}
+
+{% endblock content %}

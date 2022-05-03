@@ -1,0 +1,32 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+News
+{% endblock title %}
+
+{% block content %}
+
+<form method="POST">
+    {% csrf_token %}
+     <table>
+         <tr>
+            <td>
+                Заголовок: {{ form.title }}
+            </td>
+            <td>
+                Категория: {{ form.category }}
+            </td>
+            <td>
+                Автор: {{ form.author }}
+            </td>
+         </tr>
+         <tr>
+             <td>
+                Текст: {{ form.text }}
+            </td>
+         </tr>
+     </table>
+    <input type="submit" value="Добавить новость">
+</form>
+
+{% endblock content %}
