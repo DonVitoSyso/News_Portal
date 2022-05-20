@@ -9,7 +9,7 @@ class PostForm(ModelForm):
     #     queryset=Category.objects.all(),
     #     empty_label=None,
     # )
-    # в класс мета, как обычно, надо написать модель, по которой будет строится форма и нужные нам поля. Мы уже делали что-то похожее с фильтрами.
+    # в класс мета, как обычно, надо написать модель, по которой будет строится форма и нужные нам поля.
     class Meta:
         model = Post
         fields = ['title', 'text', 'author', 'category']

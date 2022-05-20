@@ -5,7 +5,7 @@ from .models import Post, Category
 from datetime import datetime
 
 from django.core.paginator import Paginator  # импортируем класс, позволяющий удобно осуществлять постраничный вывод
-from .search import PostSearch  # импортируем недавно написанный фильтр
+from .search import PostSearch, PostCategory  # импортируем недавно написанный фильтр
 from .form import PostForm, AuthorForm  # импортируем нашу форму
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
@@ -54,6 +54,34 @@ class PostDetail(DetailView):
     template_name = 'new.html'  # название шаблона будет new.html
     context_object_name = 'new'  # название объекта. в нём будет
     queryset = Post.objects.all()
+
+    # def post(self, request, *args, **kwargs):
+    #     appointment = Appointment(
+    #         message=request.POST['category'],
+    #     )
+    #     appointment.save()
+    #
+    #     # получаем наш html
+    #     html_content = render_to_string(
+    #         'subscriber_created.html',
+    #         {
+    #             'appointment': appointment,
+    #         }
+    #     )
+    #
+    #     msg = EmailMultiAlternatives(
+    #         subject=f'{appointment.client_name}',
+    #         # имя клиента и дата записи будут в теме для удобства
+    #         body=appointment.message,  # это то же, что и message
+    #         from_email='vitosyso@yandex.ru',
+    #         to=['vitosyso@yandex.ru'],  # это то же, что и recipients_list
+    #     )
+    #     msg.attach_alternative(html_content, "text/html")  # добавляем html
+    #
+    #     msg.send()  # отсылаем
+    #
+    #     return redirect('new')
+
 
 # дженерик для создания объекта. Надо указать только имя шаблона и класс формы, который мы написали в прошлом юните. Остальное он сделает за вас
 class PostCreateView(PermissionRequiredMixin, CreateView):
@@ -133,3 +161,22 @@ class ArticleCreateView(PermissionRequiredMixin, CreateView):
     permission_required = ('New_Portal.add_new',)
     template_name = 'new_create.html'
     form_class = PostForm
+
+
+class SubscribeMake(PermissionRequiredMixin, CreateView):
+    model = Post
+    template_name = 'subscribe_make.html'
+    form_class = PostForm
+    permission_required = ('New_Portal.add_new',)
+
+    def get_filter(self):
+        return PostCategory(self.request.GET, queryset=super().get_queryset())
+
+    def get_queryset(self):
+        return self.get_filter().qs
+
+    def get_context_data(self, **kwargs):
+        return {
+            **super().get_context_data(**kwargs),
+            'filter2': self.get_filter(),
+        }

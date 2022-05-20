@@ -1,0 +1,32 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+News
+{% endblock title %}
+{% load custom_tags %}
+
+{% block content %}
+    <h1>Подписанные категории</h1>
+    {{ filter2.form }}
+    <td><a href="{% url 'subscribe_make' %}">Подписаться</a><br></td>
+    <hr>
+
+    <h3>Подписаться на следующие категории:</h3>
+    <table>
+        <td>
+            <tr>
+                <td><h3> --- Подписаться --- </h3></td>
+                <td>|</td>
+                <td><h3> --- Отписаться --- </h3></td>
+            </tr>
+            <!-- Достаем все категории по связи многим ко многим -->
+            {% for category in form.category %}
+            <tr>
+                <td>
+                        <a href="{% url 'subscribe_make' %}">{{ category }}</a>
+                </td>
+                <td>|</td>
+            </tr>
+            {% endfor %}
+    </table>
+{% endblock content %}

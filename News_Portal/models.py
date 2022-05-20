@@ -33,7 +33,7 @@ class Author(models.Model):
 # Класс написан
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    subscribers = models.ForeignKey(User, on_delete=models.CASCADE, default='', null=True)
+    subscribers = models.ManyToManyField(User, )
     def __str__(self):
         return f'{self.name}'
 

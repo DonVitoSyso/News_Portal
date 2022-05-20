@@ -33,10 +33,22 @@ class PostSearch(FilterSet):
     category = ModelChoiceFilter(
         queryset=Category.objects.all(),
         label='Категория',
-        empty_label='Все категорииё',
+        empty_label='Все категории',
     )
     # Здесь в мета классе надо предоставить модель и указать поля, по которым будет фильтроваться
     # (т. е. подбираться) информация о товарах
     class Meta:
         model = Post
-        fields = ('date', 'title', 'author', 'category')
+        fields = ['date', 'title', 'author', 'category']
+
+
+class PostCategory(FilterSet):
+    category = ModelChoiceFilter(
+        queryset=Category.objects.all(),
+        label='Категория',
+        empty_label='Все категории',
+    )
+
+    class Meta:
+        model = Post
+        fields = ['category']
