@@ -9,6 +9,14 @@ from .search import PostSearch, PostCategory  # импортируем неда�
 from .form import PostForm, AuthorForm  # импортируем нашу форму
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+# из эталона
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.mail import EmailMultiAlternatives  # импортируем класс для создание объекта письма с html
+from django.shortcuts import redirect
+from django.template.loader import render_to_string  # импортируем функцию, которая срендерит наш html в текст
+from django.urls import resolve
+from django.utils.timezone import datetime
 
 
 # class PostList(ListView):
@@ -33,7 +41,7 @@ class PostList(ListView):#(PermissionRequiredMixin, ListView):
     template_name = 'news.html'  # указываем имя шаблона, в котором будет лежать HTML, в котором будут все инструкции о том, как именно пользователю должны вывестись наши объекты
     context_object_name = 'news'
     paginate_by = 10  # поставим постраничный вывод в 10 элементов
-    ordering = ['-id']
+    ordering = ['-date']
     # queryset = Post.objects.all()  # Default: Model.objects.all()
     # form_class = PostForm  # добавляем форм класс, чтобы получать доступ к форме через метод POST
 
@@ -43,14 +51,16 @@ class PostList(ListView):#(PermissionRequiredMixin, ListView):
         context['filter'] = PostSearch(self.request.GET, queryset=self.get_queryset())  # вписываем наш фильтр в контекст
         context['count'] = Post.objects.all().count() #добавили поле для общего колличества страниц
         # context['categories'] = Category.objects.all()
-        # context['form'] = PostForm()
+        # раскоментировал context['form'] = PostForm
+        context['form'] = PostForm
         return context
 
 
 # создаём представление, в котором будут детали конкретного отдельного товара
 # дженерик для получения деталей о новости
 class PostDetail(DetailView):
-    # model = Post  # модель всё та же, но мы хотим получать детали конкретно отдельного товара
+    # раскоментировал model = Post
+    model = Post  # модель всё та же, но мы хотим получать детали конкретно отдельного товара
     template_name = 'new.html'  # название шаблона будет new.html
     context_object_name = 'new'  # название объекта. в нём будет
     queryset = Post.objects.all()
@@ -91,11 +101,34 @@ class PostCreateView(PermissionRequiredMixin, CreateView):
     template_name = 'new_create.html'
     form_class = PostForm
     # success_url = '/news/'
+    # из эталона (задание на ограничение по кол-ву постов в день)
+    error_message = 'You cannot post more than 3 posts a day!'
 
     def form_valid(self, form):
         post = form.save(commit=False)
         post.type = 'NEWS'
-        return super().form_valid(form)
+        # Из эталона вся процедура ниже
+        postAuthor = Author.objects.get(user=self.request.user)
+        posts = Post.objects.all()
+        count_todays_posts = 0
+        for post in posts:
+            if post.author == postAuthor:
+                time_delta = datetime.now().date() - post.dateCreated.date()
+                if time_delta.total_seconds() < 86400:
+                    count_todays_posts += 1
+
+        if count_todays_posts < 3:
+            self.object.save()
+            cat = Category.objects.get(pk=self.request.POST['category'])
+            self.object.category.add(cat)
+            validated = super().form_valid(form)
+
+        else:
+            messages.error(self.request, error_message)
+            validated = super().form_invalid(form)
+
+        return validated
+        # return super().form_valid(form)
 
 
 # дженерик для редактирования объекта
@@ -127,7 +160,7 @@ class PostSearchView(ListView):
     template_name = 'new_search.html'  # указываем имя шаблона, в котором будет лежать HTML, в котором будут все инструкции о том, как именно пользователю должны вывестись наши объекты
     context_object_name = 'news'
     paginate_by = 10  # поставим постраничный вывод в 10 элементов
-    ordering = ['-id']
+    ordering = ['-date']
     # queryset = Post.objects.all()  # Default: Model.objects.all()
     # form_class = PostForm  # добавляем форм класс, чтобы получать доступ к форме через метод POST
 
@@ -140,6 +173,14 @@ class PostSearchView(ListView):
         return self.get_filter().qs
 
     def get_context_data(self, **kwargs):
+        # из эталона
+        # context = super().get_context_data(**kwargs)
+        # # вписываем наш фильтр в контекст
+        # context['filter'] = PostFilter(
+        #     self.request.GET, queryset=self.get_queryset())
+        # # context['categories'] = Category.objects.all()
+        # context['form'] = PostForm
+        # return context
         return {
             **super().get_context_data(**kwargs),
             'filter': self.get_filter(),
