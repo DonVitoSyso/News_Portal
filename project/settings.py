@@ -39,9 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'News_Portal',
     'django.contrib.sites',
     'django.contrib.flatpages',
+
+    'News_Portal',
     'django_filters',
     'sign',
     'protect',
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
 ]
 
+# SITE_ID используется в случае, если данный проект управляет несколькими сайтами
 SITE_ID = 1
 
 MIDDLEWARE = [
