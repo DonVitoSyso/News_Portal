@@ -7,5 +7,7 @@
 <button> <a href="sign/logout/">Выйти</a> </button>
 {% if is_not_author %}
 <button> <a href="sign/upgrade/"> Стать автором. </a> </button>
+{% else %}
+<button> <a href="sign/upgrade/"> Удалить из автора. </a> </button>
 {% endif %}
 {% endblock %}

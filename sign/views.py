@@ -16,8 +16,15 @@ class BaseRegisterView(CreateView):
 def upgrade_me(request):
     user = request.user
     author_group = Group.objects.get(name='authors')
+    print(request.user.groups.name)
     if not request.user.groups.filter(name='authors').exists():
-        user1 = Author(user=user) #сохраняем нашего пользователя в список авторов модели
-        user1.save()
+        # мой код
+        # user1 = Author(user=user) #сохраняем нашего пользователя в список авторов модели
+        # user1.save()
+        # код из FAQ
+        Author.objects.create(user=user)
         author_group.user_set.add(user)
+    else:
+        Author.objects.filter(user=user).delete()
+        author_group.user_set.remove(user)
     return redirect('/')

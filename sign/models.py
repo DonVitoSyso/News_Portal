@@ -11,12 +11,19 @@ class BaseRegisterForm(UserCreationForm):
 
     class Meta:
         model = User
+        # Наши поля в форме
         fields = ("username",
                   "first_name",
                   "last_name",
                   "email",
                   "password1",
                   "password2", )
+        # Наши названия полей
+        labels = {
+            "username": "Логин",
+            "first_name": "Имя",
+            "last_name": "Фамилия",
+        }
 
 
 class BasicSignupForm(SignupForm):
